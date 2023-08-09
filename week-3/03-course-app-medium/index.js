@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 
 let ADMINS = [];
-let USERS = ['users'];
+let USERS = [];
 let COURSES = [];
 
 // Persistant data operations
