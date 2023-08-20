@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 dotenv.config({ path: './config.env' });
 
@@ -18,10 +19,17 @@ const {
 const mongoConnectionUrl =
   DATABASE_URL.replace('<PASSWORD>', DATABASE_PASSWORD) + DATABASE_NAME;
 
-mongoose.connect(mongoConnectionUrl);
+
+mongoose.connect(mongoConnectionUrl).then(() => {
+        console.log('Successfully connected to MongoDB');
+    })
+    .catch((err) => {
+        console.error('Error connecting to MongoDB:', err);
+    });
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 // Auth middlewares
