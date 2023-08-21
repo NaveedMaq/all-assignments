@@ -1,15 +1,16 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import { useRecoilState } from 'recoil';
-import { isLoadingAtom, loginAtom } from '../store/atoms';
-import Button from './Button';
-import Loader from './Loader';
+import { isLoadingAtom, loginAtom, pageTitleAtom } from '../store/atoms';
+import Button from './general/Button';
+import Loader from './general/Loader';
 import { Typography } from '@mui/material';
 
 function AppBar() {
   const navigate = useNavigate();
   const [isLoggedIn, setLoginAtom] = useRecoilState(loginAtom);
   const [isLoading] = useRecoilState(isLoadingAtom);
+  const [pageTitle] = useRecoilState(pageTitleAtom);
 
   return (
     <div
@@ -21,12 +22,27 @@ function AppBar() {
         padding: '1rem 2rem',
       }}
     >
-      <img
-        src='/coursera.svg'
-        alt='Coursera Logo'
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer', width: '10rem' }}
-      />
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <img
+          src='/coursera.svg'
+          alt='Coursera Logo'
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer', width: '10rem' }}
+        />
+
+        <Typography
+          variant='h1'
+          style={{
+            fontSize: '1rem',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontWeight: 'bold',
+          }}
+        >
+          {pageTitle} Page
+        </Typography>
+      </div>
 
       {isLoading && (
         <div

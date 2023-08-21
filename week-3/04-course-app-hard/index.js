@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const morgan = require('morgan');
 
 dotenv.config({ path: './config.env' });
 
@@ -19,16 +20,18 @@ const {
 const mongoConnectionUrl =
   DATABASE_URL.replace('<PASSWORD>', DATABASE_PASSWORD) + DATABASE_NAME;
 
-
-mongoose.connect(mongoConnectionUrl).then(() => {
-        console.log('Successfully connected to MongoDB');
-    })
-    .catch((err) => {
-        console.error('Error connecting to MongoDB:', err);
-    });
+mongoose
+  .connect(mongoConnectionUrl)
+  .then(() => {
+    console.log('Successfully connected to MongoDB');
+  })
+  .catch((err) => {
+    console.error('Error connecting to MongoDB:', err);
+  });
 
 const app = express();
 
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 
@@ -230,11 +233,37 @@ app.post('/users/login', async (req, res) => {
 app.get('/users/courses', userAuth, async (req, res) => {
   // logic to list all courses
   const publishedCourses = await Course.find({ published: true });
+  console.log({ publishedCourses });
 
   res.status(200).json({
     status: 'success',
     results: publishedCourses.length,
     data: { courses: publishedCourses },
+  });
+});
+
+app.get('/users/courses/:courseId', userAuth, async (req, res) => {
+  // logic to list all courses
+  const courseId = req.params.courseId;
+
+  if (!mongoose.isValidObjectId(courseId)) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Invalid course id',
+    });
+  }
+  const course = await Course.findOne({ _id: courseId, published: true });
+
+  if (!course) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Course not found',
+    });
+  }
+
+  res.status(200).json({
+    status: 'success',
+    course,
   });
 });
 
